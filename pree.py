@@ -235,7 +235,7 @@ class MyForm(QtGui.QMainWindow):
             #This is the single match
             self.populate_match_textbrowser(match_obj.start(), match_obj.end())
 
-        spans = self.findAllSpans(compile_obj)
+    spans = controller.getSpans() 
         #This will fill in all matches
         self.populate_matchAll_textbrowser(spans)
 
@@ -272,12 +272,10 @@ class MyForm(QtGui.QMainWindow):
         #print(group_tuples)
         self.populate_group_textbrowser(group_tuples)
   
-  #refactor    
     def findAllSpans(self, compile_obj):
         spans = []
 
         match_obj = compile_obj.search(self.matchstring)
-
         last_span = None
 
         while match_obj:
@@ -296,7 +294,6 @@ class MyForm(QtGui.QMainWindow):
             print("FA Spans: ", spans)
 
         return spans
-
     def populate_match_textbrowser(self, startpos, endpos):
         pre = post = match = ""
 

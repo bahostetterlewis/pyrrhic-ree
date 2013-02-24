@@ -19,6 +19,7 @@ class _ree:
         self.flags = 0
         self.compiledRegex = re.compile(self._regex, self.flags)
         self._flagChecker = re.compile(r"^ *\(\?(?P<flags>[aiLmsx]*)\)")
+        self._debug = True
 
     #  use property to force regex compile on set
     def regex():
@@ -54,6 +55,26 @@ class _ree:
     def embeddedFlags(self):
         match = self._flagChecker.match(self.regex)
         return set(match.group('flags')) if match else set() 
+
+    def getSpans(self):
+        spans = []
+        match_obj = self.compiledRegex.search(self.matchString)
+        last_span = None
+            
+        while match_obj:
+          start = match_obj.start()
+          end   = match_obj.end()
+          span = (start, end)
+          if last_span == span:
+             break
+          spans.append(span)
+          last_span = span
+          match_obj = self.compiledRegex.search(self.matchString, end)
+
+        if self._debug:
+          print("FA Spans: ", spans)
+
+        return spans
 
 
 
