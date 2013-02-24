@@ -315,33 +315,30 @@ class MyForm(QtGui.QMainWindow):
     #refactor  
     def process_embedded_flags(self, regex):
         # determine if the regex contains embedded regex flags.
-        # if not, return 0 -- inidicating that the regex has no embedded flags
+    # if not, return False -- inidicating that the regex has no embedded flags
         # if it does, set the appropriate checkboxes on the UI to reflect the flags that are embedded
-        #   and return 1 to indicate that the string has embedded flags
-    match = controller.embeddedFlags()
-        match = self.embedded_flags_obj.match(regex)
+    #   and return True to indicate that the string has embedded flags
+    flags = controller.embeddedFlags()
 
-    if match:
-      embedded_flags = match.group('flags')
-      for flag in embedded_flags:
-        if flag == 'i':
-          self.ui.chkCase.setChecked(1)
-        elif flag == 'L':
-          self.ui.chkLocale.setChecked(1)
-        elif flag == 'm':
-          self.ui.chkMulti.setChecked(1)
-        elif flag == 's':
-          self.ui.chkDot.setChecked(1)
-        elif flag == 'a':
-          self.ui.chkAscii.setChecked(1)
-        elif flag == 'x':
-          self.ui.chkVerbose.setChecked(1)
-      return True
+    for flag in flags:
+      if flag == 'i':
+        self.ui.chkCase.setChecked(True)
+      elif flag == 'L':
+        self.ui.chkLocale.setChecked(True)
+      elif flag == 'm':
+        self.ui.chkMulti.setChecked(True)
+      elif flag == 's':
+        self.ui.chkDot.setChecked(True)
+      elif flag == 'a':
+        self.ui.chkAscii.setChecked(True)
+      elif flag == 'x':
+        self.ui.chkVerbose.setChecked(True)
 
-    return False 
+    #  Not sure where this is used yet
+    return True if flags else False
 
     def urlImported(self, html):
-        #self.url = url
+        controller.matchString = html
         self.ui.tedString.setPlainText(html)
 
     def showAbout(self):
