@@ -129,13 +129,13 @@ class MyForm(QtGui.QMainWindow):
         self.regex = self.ui.tedReg.toPlainText()
         self.process_regex()
 
-  # refactor  
+  # refactor
     def strChange(self):
     controller.matchString = self.ui.tedString.toPlainText()
         self.matchstring = self.ui.tedString.toPlainText()
         self.process_regex()
-  
-  # refactor  
+
+  # refactor
     def repChange(self):
     controller.replaceString = self.ui.tedReplace.toPlainText()
         self.replace = self.ui.tedReplace.toPlainText()
@@ -203,11 +203,11 @@ class MyForm(QtGui.QMainWindow):
     #  if paused do nothing
         if self.is_paused:
             return
-     
+
     #  find all embeded flags
         self.process_embedded_flags(self.regex)
 
-    #  check for the replacement and then 
+    #  check for the replacement and then
     #  do the subs - both all subs and just first
         if self.replace:
             repl = re.sub(self.regex, self.replace, self.matchstring, 0, self.flags)
@@ -217,7 +217,7 @@ class MyForm(QtGui.QMainWindow):
             self.ui.tebRep1.setText(repl1)
 
     #  The regex should always be compiled.
-    compile_obj = re.compile(self.regex, self.flags)  
+    compile_obj = re.compile(self.regex, self.flags)
 
         allmatches = compile_obj.findall(self.matchstring)
 
@@ -235,7 +235,7 @@ class MyForm(QtGui.QMainWindow):
             #This is the single match
             self.populate_match_textbrowser(match_obj.start(), match_obj.end())
 
-    spans = controller.getSpans() 
+    spans = controller.getSpans()
         #This will fill in all matches
         self.populate_matchAll_textbrowser(spans)
 
@@ -271,7 +271,7 @@ class MyForm(QtGui.QMainWindow):
 
         #print(group_tuples)
         self.populate_group_textbrowser(group_tuples)
-  
+
     def findAllSpans(self, compile_obj):
         spans = []
 
