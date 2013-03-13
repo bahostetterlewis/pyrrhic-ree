@@ -85,4 +85,22 @@ class _ree:
 
         return spans
 
+    def replaceAll(self):
+        return self.replaceArbitraryCount(0)
+
+    def replaceArbitraryCount(self, count):
+        return self.compiledRegex.sub(
+            self.regex,
+            self.replace,
+            self.matchString,
+            count,
+            self.flags,
+        )
+
+    def allMatches(self):
+        return self.compiledRegex.findall(self.matchString)
+
+    def search(self, searchString):
+        return self.compiledRegex.search(self.searchString)
+
 Controller = _ree()

@@ -21,7 +21,7 @@ def allMatches(self):
 
 
 def search(self, searchString):
-    return self.compiledRegex(self.searchString)
+    return self.compiledRegex.search(self.searchString)
 '''
 end controller funcs
 '''
@@ -37,7 +37,7 @@ def should_process_regex(self):
     return proceed and not self.is_paused
 
 
-def populateReplacements(self):
+def processReplacements(self):
     #  check for the replacement and then
     #  do the subs - both all subs and just first
     if controller.replace:
@@ -48,11 +48,11 @@ def populateReplacements(self):
         self.ui.tebRep1.setText(replaceFirst)
 
 
-def processFindAll(self, allmatches):
+def processFindAll(self):
     #This is a big change I"m not updating the spinner
-    if allmatches:
-        match_index = len(allmatches) - 1
-        print('MatchIndex: ' + str(match_index))
+    allMatches = controller.allMatches()
+    if allMatches:
+        print('MatchIndex:', len(allMatches)-1)
 
     match_obj = controller.search()
 
@@ -63,28 +63,19 @@ def processFindAll(self, allmatches):
     else:
         #This is the single match
         self.populate_match_textbrowser(match_obj.start(), match_obj.end())
-
-    spans = controller.getSpans()
-    #This will fill in all matches
-    #This is a big change I"m not updating the spinner
-    self.populate_matchAll_textbrowser(spans)
-    if allmatches:
-        match_index = len(allmatches) - 1
-        print('MatchIndex: ' + str(match_index))
-
-    spans = controller.getSpans()
-    #This will fill in all matches
-    self.populate_matchAll_textbrowser(spans)
+        #This will fill in all matches
+        #This is a big change I"m not updating the spinner
+        spans = controller.getSpans()
+        self.populate_matchAll_textbrowser(spans)
 
 
-def processGroups(self, allMatches):
+def processGroups(self):
     #This is the start of groups and right now it goes to the end of process_regex
     #It works right now as long as groups are not named - I think
     print(controller.compiledRegex.groupindex)
 
+    allMatches = controller.allMatches()
     match_obj = controller.search()
-
-    match_index = len(allMatches)
 
     group_tuples = []
 
@@ -99,7 +90,7 @@ def processGroups(self, allMatches):
 
         #Here I build a tuple of tuples - with each group match
         #it is match number, group number, name and then the match
-        for x in range(match_index):
+        for x in range(len(allMatches)):
             g = allMatches[x]
             if isinstance(g, tuple):
                 for i in range(len(g)):
@@ -117,7 +108,6 @@ def process_regex(self):
         return
 
     self.process_embedded_flags()
-    self.populateReplacements()
-    allmatches = controller.allMatches()
-    self.calculateFindAll(allmatches)
-    self.processGroups(allmatches)
+    self.processReplacements()
+    self.processFindAll()
+    self.processGroups()

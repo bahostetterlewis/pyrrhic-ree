@@ -99,7 +99,6 @@ class MyForm(QtGui.QMainWindow):
         off without the need for any logic.
         '''
         controller.flags ^= toggledFlagValue
-        self.flags ^= toggledFlagValue
         self.process_regex()
 
     def clickPause(self):
@@ -123,22 +122,16 @@ class MyForm(QtGui.QMainWindow):
             self.ui.gbReg.setStyleSheet(r'QGroupBox{font-weight: normal; color: black;}')
             self.ui.gbReg.setTitle('Regular Expression Pattern')
 
-  # refactor
     def regChange(self):
         controller.regex = self.ui.tedReg.toPlainText()
-        self.regex = self.ui.tedReg.toPlainText()
         self.process_regex()
 
-  # refactor
     def strChange(self):
         controller.matchString = self.ui.tedString.toPlainText()
-        self.matchstring = self.ui.tedString.toPlainText()
         self.process_regex()
 
-  # refactor
     def repChange(self):
         controller.replaceString = self.ui.tedReplace.toPlainText()
-        self.replace = self.ui.tedReplace.toPlainText()
         self.process_regex()
 
     # The tuple holds two things - the group name and the contents of the match and I can count rows
@@ -193,40 +186,33 @@ class MyForm(QtGui.QMainWindow):
         self.ui.tebRepAll.setHtml("")
         self.ui.statusbar.clearMessage()
 
-  # refactor
-    def process_regex(self):
-    #  if not valid clear and exit func
-        if not self.regex or not self.matchstring:
-            self.clear_results()
-            return
+    def should_process_regex(self):
+        proceed = True
 
-    #  if paused do nothing
-        if self.is_paused:
-            return
+        if not controller.regex or not controller.matchString:
+            self.clear_results
+            proceed = False
 
-    #  find all embeded flags
-        self.process_embedded_flags(self.regex)
+        return proceed and not self.is_paused
 
-    #  check for the replacement and then
-    #  do the subs - both all subs and just first
-        if self.replace:
-            repl = re.sub(self.regex, self.replace, self.matchstring, 0, self.flags)
-            repl1 = re.sub(self.regex, self.replace, self.matchstring, 1, self.flags)
-            print('REPL: ', repl)
-            self.ui.tebRepAll.setText(repl)
-            self.ui.tebRep1.setText(repl1)
+    def processReplacements(self):
+        #  check for the replacement and then
+        #  do the subs - both all subs and just first
+        if controller.replace:
+            replaceAll = controller.replaceAll()
+            replaceFirst = controller.replaceArbitraryCount(1)
+            print('REPL: ', replaceAll)
+            self.ui.tebRepAll.setText(replaceAll)
+            self.ui.tebRep1.setText(replaceFirst)
 
-    #  The regex should always be compiled.
-        compile_obj = re.compile(self.regex, self.flags)
-
-        allmatches = compile_obj.findall(self.matchstring)
-
+    def processFindAll(self):
         #This is a big change I"m not updating the spinner
-        if allmatches and len(allmatches):
-            match_index = len(allmatches) - 1
-            print('MatchIndex: ' + str(match_index))
+        allMatches = controller.allMatches()
+        if allMatches:
+            print('MatchIndex:', len(allMatches)-1)
 
-        match_obj = compile_obj.search(self.matchstring)
+        match_obj = controller.search()
+
         if match_obj is None:
             self.ui.tebMatch.setPlainText("No Match")
             self.ui.tebMatchAll.setPlainText("No Match")
@@ -234,34 +220,34 @@ class MyForm(QtGui.QMainWindow):
         else:
             #This is the single match
             self.populate_match_textbrowser(match_obj.start(), match_obj.end())
+            #This will fill in all matches
+            #This is a big change I"m not updating the spinner
+            spans = controller.getSpans()
+            self.populate_matchAll_textbrowser(spans)
 
-        spans = controller.getSpans()
-        #This will fill in all matches
-        self.populate_matchAll_textbrowser(spans)
-
+    def processGroups(self):
         #This is the start of groups and right now it goes to the end of process_regex
         #It works right now as long as groups are not named - I think
-        print(compile_obj.groupindex)
+        print(controller.compiledRegex.groupindex)
 
-        match_index = len(allmatches)
+        allMatches = controller.allMatches()
+        match_obj = controller.search()
 
         group_tuples = []
 
         if match_obj.groups():
-            num_groups = len(match_obj.groups())
-
             group_nums = {}
 
             #This creates a dictionary of group names
-            if compile_obj.groupindex:
-                keys = compile_obj.groupindex.keys()
+            if controller.compiledRegex.groupindex:
+                keys = controller.compiledRegex.groupindex.keys()
                 for key in keys:
-                    group_nums[compile_obj.groupindex[key]] = key
+                    group_nums[controller.compiledRegex.groupindex[key]] = key
 
             #Here I build a tuple of tuples - with each group match
             #it is match number, group number, name and then the match
-            for x in range(match_index):
-                g = allmatches[x]
+            for x in range(len(allMatches)):
+                g = allMatches[x]
                 if isinstance(g, tuple):
                     for i in range(len(g)):
                         group_tuple = (x+1, i+1, group_nums.get(i+1, ""), g[i])
@@ -272,28 +258,14 @@ class MyForm(QtGui.QMainWindow):
         #print(group_tuples)
         self.populate_group_textbrowser(group_tuples)
 
-    def findAllSpans(self, compile_obj):
-        spans = []
+    def process_regex(self):
+        if not self.should_process_regex():
+            return
 
-        match_obj = compile_obj.search(self.matchstring)
-        last_span = None
-
-        while match_obj:
-            start = match_obj.start()
-            end = match_obj.end()
-            span = (start, end)
-            if last_span == span:
-                break
-
-            spans.append(span)
-
-            last_span = span
-            match_obj = compile_obj.search(self.matchstring, end)
-
-        if self.debug:
-            print("FA Spans: ", spans)
-
-        return spans
+        self.process_embedded_flags()
+        self.processReplacements()
+        self.processFindAll()
+        self.processGroups()
 
     def populate_match_textbrowser(self, startpos, endpos):
         pre = post = match = ""
