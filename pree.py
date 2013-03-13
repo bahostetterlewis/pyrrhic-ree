@@ -32,10 +32,6 @@ from modules.mainWindow import *
 from modules.about import *
 from modules.urlDialog import *
 
-# regex to find special flags which must begin at beginning of line
-# or after some spaces
-EMBEDDED_FLAGS = r"^ *\(\?(?P<flags>[aiLmsx]*)\)"
-
 ###################################################################
 #
 # The Form class that builds the form and inserts logic
@@ -69,14 +65,9 @@ class MyForm(QtGui.QMainWindow):
         self.ui.chkLocale.toggled.connect(lambda: self.checkChange(re.LOCALE))
         self.ui.chkAscii.toggled.connect(lambda: self.checkChange(re.ASCII))
 
-        self.regex = ""
-        self.matchstring = ""
-        self.replace = ""
-        self.flags = 0
         self.is_paused = False
         self.debug = False
         self.group_tuples = None
-        self.embedded_flags_obj = re.compile(EMBEDDED_FLAGS)
 
         self.MNUMBER = self.tr("Match Number")
         self.GNUMBER = self.tr("Group Number")
@@ -163,7 +154,7 @@ class MyForm(QtGui.QMainWindow):
         idx = 0
         disp = ""
         result = ""
-        text = self.matchstring
+        text = controller.matchString
 
         for span in spans:
             if span[0] != 0:
@@ -189,6 +180,7 @@ class MyForm(QtGui.QMainWindow):
     def should_process_regex(self):
         proceed = True
 
+        print("TYPE:", type(controller))
         if not controller.regex or not controller.matchString:
             self.clear_results
             proceed = False
@@ -198,7 +190,7 @@ class MyForm(QtGui.QMainWindow):
     def processReplacements(self):
         #  check for the replacement and then
         #  do the subs - both all subs and just first
-        if controller.replace:
+        if controller.replaceString:
             replaceAll = controller.replaceAll()
             replaceFirst = controller.replaceArbitraryCount(1)
             print('REPL: ', replaceAll)
@@ -235,7 +227,7 @@ class MyForm(QtGui.QMainWindow):
 
         group_tuples = []
 
-        if match_obj.groups():
+        if match_obj is not None and match_obj.groups():
             group_nums = {}
 
             #This creates a dictionary of group names
@@ -260,7 +252,10 @@ class MyForm(QtGui.QMainWindow):
 
     def process_regex(self):
         if not self.should_process_regex():
+            print("DO NOT PROCESS")
             return
+        else:
+            print("DO PROCESS")
 
         self.process_embedded_flags()
         self.processReplacements()
@@ -270,20 +265,19 @@ class MyForm(QtGui.QMainWindow):
     def populate_match_textbrowser(self, startpos, endpos):
         pre = post = match = ""
 
-        match = self.matchstring[startpos:endpos]
+        match = controller.matchString[startpos:endpos]
 
         # prepend the beginning that didn't match
         if startpos > 0:
-            pre = self.matchstring[0:startpos]
+            pre = controller.matchString[0:startpos]
 
         # append the end that didn't match
-        if endpos < len(self.matchstring):
-            post = self.matchstring[endpos:]
+        if endpos < len(controller.matchString):
+            post = controller.matchString[endpos:]
 
         self.ui.tebMatch.setHtml(pre + self.highlightStart + match + self.highlightEnd + post)
 
-    #refactor
-    def process_embedded_flags(self, regex):
+    def process_embedded_flags(self):
         #  determine if the regex contains embedded regex flags.
         #  if not, return False -- inidicating that the regex has no embedded flags
         #  if it does, set the appropriate checkboxes on the UI to reflect the flags that are embedded
@@ -304,8 +298,8 @@ class MyForm(QtGui.QMainWindow):
             elif flag == 'x':
                 self.ui.chkVerbose.setChecked(True)
 
-    #  Not sure where this is used yet
-    return True if flags else False
+        #  Not sure where this is used yet
+        return True if flags else False
 
     def urlImported(self, html):
         controller.matchString = html
