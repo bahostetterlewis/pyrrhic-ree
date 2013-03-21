@@ -153,7 +153,7 @@ class _ree:
         tmp = None
         try:
             tmp = re.compile(self._regex, self._flags)
-        except:
+        except re.error:
             if self._debug:
                 print("Incomplete Regex")
         else:
