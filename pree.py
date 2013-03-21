@@ -198,6 +198,7 @@ class MyForm(QtGui.QMainWindow):
             self.ui.tebRep1.setText(replaceFirst)
 
     def processFind(self):
+        match_obj = controller.search()
 
         if match_obj is None:
             self.ui.tebMatch.setPlainText("No Match")
