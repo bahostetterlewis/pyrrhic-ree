@@ -8,6 +8,8 @@ all views must be programmed against.
 
 import re
 
+from utils import SetUndo
+
 
 class _ree:
     """
@@ -24,6 +26,8 @@ class _ree:
         self._flagChecker = re.compile(r"^ *\(\?(?P<flags>[aiLmsx]*)\)")
         self._debug = True
         self.updateView = lambda: None
+        self._undo = []
+        self._redo = []
 
     #  use property to force regex compile on set
     def regex():
@@ -32,6 +36,7 @@ class _ree:
         def fget(self):
             return self._regex
 
+        @SetUndo
         def fset(self, value):
             self._regex = str(value)
             self.compile()
@@ -46,11 +51,26 @@ class _ree:
         def fget(self):
             return self._matchString
 
+        @SetUndo
         def fset(self, value):
             self._matchString = str(value)
             self.updateView()
         return locals()
     matchString = property(**matchString())
+
+    #  use property to force new values to convert to strings
+    def replaceString():
+        doc = "The replacement string"
+
+        def fget(self):
+            return self._replaceString
+
+        @SetUndo
+        def fset(self, value):
+            self._replaceString = str(value)
+            self.updateView()
+        return locals()
+    replaceString = property(**replaceString())
 
     #use a property to force compile on flag update
     def flags():
@@ -66,19 +86,6 @@ class _ree:
 
         return locals()
     flags = property(**flags())
-
-    #  use property to force new values to convert to strings
-    def replaceString():
-        doc = "The replacement string"
-
-        def fget(self):
-            return self._replaceString
-
-        def fset(self, value):
-            self._replaceString = str(value)
-            self.updateView()
-        return locals()
-    replaceString = property(**replaceString())
 
     def embeddedFlags(self):
         match = self._flagChecker.match(self.regex)
@@ -158,5 +165,19 @@ class _ree:
                 print("Incomplete Regex")
         else:
             self.compiledRegex = tmp
+
+    def SaveState(self):
+        oldRegex = self._regex
+        oldMatchString = self._matchString
+        oldReplaceString = self._replaceString
+
+        def revert():
+            self._regex = oldRegex
+            self._matchString = oldMatchString
+            self._replaceString = oldReplaceString
+            self.compile()
+            self.updateView()
+
+        return revert
 
 Controller = _ree()
