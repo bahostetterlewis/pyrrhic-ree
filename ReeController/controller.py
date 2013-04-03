@@ -8,7 +8,7 @@ all views must be programmed against.
 
 import re
 
-from utils import SetUndo
+from utils import SetUndo, SetRedo
 
 
 class _ree:
@@ -36,7 +36,7 @@ class _ree:
         def fget(self):
             return self._regex
 
-        @SetUndo
+        @SetUndo()
         def fset(self, value):
             self._regex = str(value)
             self.compile()
@@ -51,7 +51,7 @@ class _ree:
         def fget(self):
             return self._matchString
 
-        @SetUndo
+        @SetUndo()
         def fset(self, value):
             self._matchString = str(value)
             self.updateView()
@@ -65,7 +65,7 @@ class _ree:
         def fget(self):
             return self._replaceString
 
-        @SetUndo
+        @SetUndo()
         def fset(self, value):
             self._replaceString = str(value)
             self.updateView()
@@ -165,6 +165,20 @@ class _ree:
                 print("Incomplete Regex")
         else:
             self.compiledRegex = tmp
+
+    @SetRedo
+    def undo(self):
+        try:
+            self._undo.pop()()
+        except IndexError:
+            pass
+
+    @SetUndo(clearRedo=False)
+    def redo(self):
+        try:
+            self._redo.pop()()
+        except IndexError:
+            pass
 
     def SaveState(self):
         oldRegex = self._regex
