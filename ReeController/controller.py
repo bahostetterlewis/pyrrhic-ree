@@ -21,7 +21,7 @@ class _ree:
         self._replaceString = ""
         self._flags = 0
         self.compiledRegex = re.compile(self._regex, self._flags)
-        self._flagChecker = re.compile(r"^ *\(\?(?P<flags>[aiLmsx]*)\)")
+        self._flagChecker = re.compile(r"^ *flags=(?P<flags>[aiLmsx]*)")
         self._debug = True
         self.updateView = lambda: None
 
