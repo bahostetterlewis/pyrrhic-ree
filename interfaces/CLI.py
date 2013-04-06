@@ -14,12 +14,7 @@ def printGroups(allData):
     # agregate the passed data and find out table dimensions
     columns = namedtuple('colums', ['matchNumbers', 'groupNumbers', 'matchNames', 'matches'])
     columnData = columns(*zip(*allData))
-    columnMaxes = columns(
-        maxlen(columnData.matchNumbers, headers[0]),
-        maxlen(columnData.groupNumbers, headers[1]),
-        maxlen(columnData.matchNames, headers[2]),
-        maxlen(columnData.matches, headers[3])
-        )
+    columnMaxes = columns(*[maxlen(curColumn, headers[index]) for index, curColumn in enumerate(columnData)])
     totalLengths = reduce(add, columnMaxes)
 
     # build all row formatters as well as the divider
@@ -67,5 +62,5 @@ def maxlen(iterable, other):
     return len(max(maxVal, other, key=len))
 
 if __name__ == '__main__':
-    data = [(1, 1, '', 'abc'), (1, 2, '', 'def')]
+    data = [(1, 1, '', 'abc'), (1, 2, 'Friendly Match', 'defghijklmno')]
     printGroups(data)

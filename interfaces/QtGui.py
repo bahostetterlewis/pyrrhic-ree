@@ -131,8 +131,8 @@ class MyForm(QtGui.QMainWindow):
                   r'<th>' + self.GNUMBER + r'</th><th>' + self.MATCHNAME + r'</th><th>' +
                   self.MATCHTEXT + r'</th></tr>')
 
-        for t in tuples:
-            if t[0] % 2:
+        for index, t in enumerate(tuples):
+            if index % 2:
                 trow_start = r'<tr style="background-color:lightgreen;">'
             else:
                 trow_start = r'<tr>'
