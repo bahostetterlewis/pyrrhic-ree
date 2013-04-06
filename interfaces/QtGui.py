@@ -125,7 +125,6 @@ class MyForm(QtGui.QMainWindow):
     # The tuple holds two things - the group name and the contents of the match and I can count rows
     def populate_group_textbrowser(self):
         tuples = controller.getGroups()
-        print(tuples)
         self.ui.tebGroup.clear()
         row = 1
         result = (r'<table border=1 cellpadding=7 ><tr><th>' + self.MNUMBER + r'</th>' +

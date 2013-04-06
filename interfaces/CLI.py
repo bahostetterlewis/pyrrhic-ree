@@ -29,14 +29,9 @@ def printGroups(allData):
     rows = [['|'] for i in range(len(allData))]
 
     # create a formatter for each row using the basic formatter template
-    # first value is the number to pad by, second is the index into allData
-    # based on what the tuples returned by controller
-    columnFormatters = columns(
-        basicFormatter.format(columnMaxes.matchNumbers, 0),
-        basicFormatter.format(columnMaxes.groupNumbers, 1),
-        basicFormatter.format(columnMaxes.matchNames, 2),
-        basicFormatter.format(columnMaxes.matches, 3)
-        )
+    # provide an index to the formatter that corresponds to where that row is located
+    # based on the return value of controllers group tuples
+    columnFormatters = columns(*[basicFormatter.format(curMax, index) for index, curMax in enumerate(columnMaxes)])
 
     # finally print the table
     print(divider)
