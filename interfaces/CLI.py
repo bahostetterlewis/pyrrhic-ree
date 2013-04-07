@@ -1,6 +1,26 @@
 from operator import add
 from functools import reduce
 from collections import namedtuple
+import re
+
+
+from ReeController import controller
+controller = controller.Controller
+
+'''
+CLI Globals
+'''
+# FLAG_CALLS = {
+#     'a': lambda: updateFlags(re.ASCII),
+#     'i': lambda: updateFlags(re.IGNORECASE),
+#     'L': lambda: updateFlags(re.LOCALE),
+#     'm': lambda: updateFlags(re.MULTILINE),
+#     's': lambda: updateFlags(re.DOTALL),
+# }
+
+
+# def updateFlags(flag):
+#     controller.flags ^= flag
 
 
 def printGroups(allData):
@@ -14,7 +34,7 @@ def printGroups(allData):
     # agregate the passed data and find out table dimensions
     columns = namedtuple('colums', ['matchNumbers', 'groupNumbers', 'matchNames', 'matches'])
     columnData = columns(*zip(*allData))
-    columnMaxes = columns(*[maxlen(curColumn, headers[index]) for index, curColumn in enumerate(columnData)])
+    columnMaxes = columns(*[maxlen(curColumn, curHeader) for curColumn, curHeader in zip(columnData, headers)])
     totalLengths = reduce(add, columnMaxes)
 
     # build all row formatters as well as the divider
@@ -24,8 +44,8 @@ def printGroups(allData):
     rows = [['|'] for i in range(len(allData))]
 
     # create a formatter for each row using the basic formatter template
-    # provide an index to the formatter that corresponds to where that row is located
-    # based on the return value of controllers group tuples
+    # index represents the current column the formatter will belong to
+    # This allows us to index the row tuple in the formatter itself using the [] format
     columnFormatters = columns(*[basicFormatter.format(curMax, index) for index, curMax in enumerate(columnMaxes)])
 
     # finally print the table
@@ -53,14 +73,61 @@ def printGroups(allData):
     print(divider)
 
 
-
-
-
 def maxlen(iterable, other):
+    '''
+    Utility used to determine row widths when creating tables
+    Gets the max length string in the iterable and returns the max betweent that and other
+    '''
     maxVal = max(iterable, key=lambda x: len(str(x)))
     maxVal = str(maxVal)
     return len(max(maxVal, other, key=len))
 
+
+def UpdateDisplay():
+    print('updating display')
+
+
+def changeRegex():
+    print('changing regex')
+
+
+def changeSearchString():
+    print('changing search string')
+
+
+def changeReplaceString():
+    print('changing replace')
+
+
+def changeFlags():
+    print('changing flags')
+
+
+def changeResultsDisplay():
+    print('changing results display')
+
+
+def Run():
+    controller.UpdateDisplay = UpdateDisplay  # set the callback
+    mainMenu = "[P]attern [S]earch [R]eplace [F]lags [V]iew Results [Q]uit"
+    print(mainMenu)
+    choice = input().lower()
+    while not choice.startswith('q'):
+        if choice.startswith('p'):
+            changeRegex()
+        elif choice.startswith('s'):
+            changeSearchString()
+        elif choice.startswith('r'):
+            changeReplaceString()
+        elif choice.startswith('f'):
+            changeFlags()
+        elif choice.startswith('v'):
+            changeResultsDisplay()
+        elif not choice.startswith('q'):
+            print('Error: <{}> is not a valid input'.format(choice))
+
+        print(mainMenu)
+        choice = input().lower()
+
 if __name__ == '__main__':
-    data = [(1, 1, '', 'abc'), (1, 2, 'Friendly Match', 'defghijklmno')]
-    printGroups(data)
+    Run()
