@@ -24,6 +24,16 @@ CLI Globals
 
 
 def printGroups(allData):
+    '''
+    Takes a list of 4-tuples and displays them in an ascii table.
+
+    The columns are dynamically sized to fit the largest data to be displayed in
+    that column. Used to pretty print groups returned from the controller.
+    '''
+    if not allData:
+        print('No groups')
+        return
+
     headers = [
         "Match Number",
         "Group Number",
