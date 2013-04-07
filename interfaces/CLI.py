@@ -34,19 +34,19 @@ def printGroups(allData):
     # agregate the passed data and find out table dimensions
     columns = namedtuple('colums', ['matchNumbers', 'groupNumbers', 'matchNames', 'matches'])
     columnData = columns(*zip(*allData))
-    columnMaxes = columns(*[maxlen(curColumn, curHeader) for curColumn, curHeader in zip(columnData, headers)])
+    columnMaxes = columns(*(maxlen(curColumn, curHeader) for curColumn, curHeader in zip(columnData, headers)))
     totalLengths = reduce(add, columnMaxes)
 
     # build all row formatters as well as the divider
     divider = '+' + '-' * (totalLengths + 3) + '+'
     basicFormatter = "{{[{1}]: ^{0}}}"
     headerStrings = ['|']
-    rows = [['|'] for i in range(len(allData))]
+    rows = [['|'] for i in enumerate(allData)]
 
     # create a formatter for each row using the basic formatter template
     # index represents the current column the formatter will belong to
     # This allows us to index the row tuple in the formatter itself using the [] format
-    columnFormatters = columns(*[basicFormatter.format(curMax, index) for index, curMax in enumerate(columnMaxes)])
+    columnFormatters = columns(*(basicFormatter.format(curMax, index) for index, curMax in enumerate(columnMaxes)))
 
     # finally print the table
     print(divider)
@@ -131,3 +131,5 @@ def Run():
 
 if __name__ == '__main__':
     Run()
+    # data = [(1, 1, '', 'abc'), (1, 2, 'Friendly Match', 'defghijklmno')]
+    # printGroups(data)
