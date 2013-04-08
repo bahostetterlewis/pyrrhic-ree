@@ -147,7 +147,11 @@ def modifyFlags(operation, flagString):
 
 
 def viewResults():
-    print('view results')
+    choice = input('View: [G]roups:').lower()
+
+    if choice.startswith('g'):
+        printGroups(controller.getGroups())
+    UpdatePrompt()
 
 
 def flagsToString():
