@@ -21,7 +21,7 @@ import os.path
 from distutils.sysconfig import get_python_lib
 
 #  get the controller and alias it to controller for easier use
-from ReeController import controller
+import controller
 controller = controller.Controller
 
 sys.path.insert(0, os.path.join(get_python_lib(), "pyrrhicree"))

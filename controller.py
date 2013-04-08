@@ -25,6 +25,7 @@ class _ree:
         self._debug = True
         self.updateView = lambda: None
         self._flagSet = set()
+        self._pauseUpdate = False
 
     #  use property to force regex compile on set
     def regex():
@@ -36,7 +37,7 @@ class _ree:
         def fset(self, value):
             self._regex = str(value)
             self.compile()
-            self.updateView()
+            self.DoUpdateView()
         return locals()
     regex = property(**regex())
 
@@ -49,7 +50,7 @@ class _ree:
 
         def fset(self, value):
             self._matchString = str(value)
-            self.updateView()
+            self.DoUpdateView()
         return locals()
     matchString = property(**matchString())
 
@@ -63,7 +64,7 @@ class _ree:
         def fset(self, value):
             self._flags = value
             self.compile()
-            self.updateView()
+            self.DoUpdateView()
 
         return locals()
     flags = property(**flags())
@@ -77,7 +78,7 @@ class _ree:
 
         def fset(self, value):
             self._replaceString = str(value)
-            self.updateView()
+            self.DoUpdateView()
         return locals()
     replaceString = property(**replaceString())
 
@@ -161,5 +162,14 @@ class _ree:
                 print("Incomplete Regex")
         else:
             self.compiledRegex = tmp
+
+    def DoUpdateView(self):
+        if not self._pauseUpdate:
+            self.updateView()
+
+    def togglePause(self):
+        self._pauseUpdate = not self._pauseUpdate
+        if not self._pauseUpdate:
+            self.updateView()
 
 Controller = _ree()
