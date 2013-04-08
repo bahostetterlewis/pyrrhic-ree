@@ -131,14 +131,14 @@ def changeFlags():
 
     if choice.startswith('t'):
         choice = input("Flag[aiLmxs]:").lower()
-        modifyFlags(xor, choice)
+        updateControllerFlags(xor, choice)
     else:
         choice = input("New flags[aiLmxs]:").lower()
         controller.flags = 0
-        modifyFlags(or_, choice)
+        updateControllerFlags(or_, choice)
 
 
-def modifyFlags(operation, flagString):
+def updateControllerFlags(operation, flagString):
     controller.togglePause()
     for flag in flagString:
         if flag in 'ailmxs':
