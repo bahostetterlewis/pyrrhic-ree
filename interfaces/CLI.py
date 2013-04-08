@@ -1,5 +1,4 @@
-from operator import add, or_, xor
-from functools import reduce
+from operator import or_, xor
 from collections import namedtuple
 import re
 
@@ -69,7 +68,7 @@ def printGroups(allData):
     columns = namedtuple('colums', ['matchNumbers', 'groupNumbers', 'matchNames', 'matches'])
     columnData = columns(*zip(*allData))
     columnMaxes = columns(*(maxlen(curColumn, curHeader) for curColumn, curHeader in zip(columnData, headers)))
-    totalLengths = reduce(add, columnMaxes)
+    totalLengths = sum(columnMaxes)
 
     # build all row formatters as well as the divider
     divider = '+' + '-' * (totalLengths + 3) + '+'
